@@ -4,23 +4,27 @@
 #include "Fila.h"
 using namespace std;
 
-void verificarNota(Aluno & aluno) {
-
+void verificarNota() {
     TipoDadoPilha topo;
     TipoCelula frente;
 
-    if (Pilha_Vazia()) {
-        if (Fila_Frente(frente)) Pilha_Empilhar(aluno);
-    }
-    else if (!Pilha_Vazia()) {
-        if (Pilha_Topo(topo)){
-            if (aluno.nota > topo.nota) {
-                Pilha_Empilhar(aluno);
+
+    //verificar com o topo enquanto o valor da fila for menor que o valor da pilha
+    while (!Fila_Vazia()) {
+        if (Fila_Frente(frente.Item)){
+            if (Pilha_Vazia()) {
+                Pilha_Empilhar(frente.Item);
+                topo = frente.Item;
+                Fila_Desenfileirar(frente.Item);
             }else {
-                TipoDadoPilha temp = topo;
-                Pilha_Desempilhar(topo);
-                Pilha_Empilhar(aluno);
-                Pilha_Empilhar(temp);
+                if (frente.Item.nota < topo.nota) {
+                    Fila_Enfileirar(topo);
+                    Pilha_Desempilhar(topo);
+                }
+                else {
+                    Pilha_Empilhar(frente.Item);
+                    Fila_Desenfileirar(frente.Item);
+                }
             }
         }
     }
@@ -36,6 +40,18 @@ void printPilha() {
     }
 }
 
+/*
+void printFila() {
+    TipoCelula frente;
+    while (!Fila_Vazia()) {
+        if (Fila_Frente(frente.Item)) {
+            printf("Aluno %d - Nota: %.2f\n", frente.Item.matricula, frente.Item.nota);
+            Fila_Desenfileirar(frente.Item);
+        }
+    }
+}*/
+
+
 void menu(Aluno aluno) {
     int opcao;
     bool condicao = true;
@@ -45,14 +61,14 @@ void menu(Aluno aluno) {
         switch (opcao) {
             case 1:
                 cout << "Digite a matricula do aluno:" << endl;
-            cin >> aluno.matricula;
-            cout << "Digite a nota do aluno:" << endl;
-            cin >> aluno.nota;
-            Fila_Enfileirar(aluno);
-            verificarNota(aluno);
-            break;
+                cin >> aluno.matricula;
+                cout << "Digite a nota do aluno:" << endl;
+                cin >> aluno.nota;
+                Fila_Enfileirar(aluno);
+                break;
             case 2:
                 cout << "Imprimindo Pilha..." << endl;
+                verificarNota();
                 printPilha();
                 condicao = false;
                 break;
@@ -60,7 +76,6 @@ void menu(Aluno aluno) {
                 cout << "Saindo..." << endl;
                 condicao = false;
                 break;
-
             default:
                 cout << "Opcao invalida!" << endl;
         }
@@ -74,9 +89,6 @@ int main() {
     Fila_Construtor();
     Pilha_Construtor();
     menu(aluno);
-
-
-
     Pilha_Destrutor();
     Fila_Destrutor();
     system("pause");
